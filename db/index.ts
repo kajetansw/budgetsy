@@ -1,7 +1,9 @@
-import { enhancePrisma } from "blitz"
-import { PrismaClient } from "@prisma/client"
+import { GraphQLClient } from 'graphql-request';
 
-const EnhancedPrisma = enhancePrisma(PrismaClient)
+const graphQLClient = new GraphQLClient('https://graphql.eu.fauna.com/graphql', {
+  headers: {
+    authorization: 'Bearer ' + process.env.FAUNA_SECRET,
+  },
+});
 
-export * from "@prisma/client"
-export default new EnhancedPrisma()
+export default graphQLClient;
