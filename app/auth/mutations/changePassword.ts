@@ -1,23 +1,55 @@
-import { NotFoundError, SecurePassword, resolver } from "blitz"
-import db from "db"
-import { authenticateUser } from "./login"
-import { ChangePassword } from "../validations"
+import { NotFoundError, SecurePassword, resolver } from 'blitz';
+import db from 'db';
+import { ChangePassword } from '../validations';
+import { authenticateUser } from '../auth-utils';
+import { gql } from 'graphql-request';
 
 export default resolver.pipe(
   resolver.zod(ChangePassword),
   resolver.authorize(),
   async ({ currentPassword, newPassword }, ctx) => {
-    const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-    if (!user) throw new NotFoundError()
+    // 1. Find user
+    const { user } = await db.request(
+      gql`
+        query getUser($id: ID!) {
+          user: findUserByID(id: $id) {
+            id: _id
+            email
+            name
+            role
+          }
+        }
+      `,
+      { id: ctx.session.userId }
+    );
+    if (!user) throw new NotFoundError();
 
-    await authenticateUser(user.email, currentPassword)
+    // 2. Authenticate
+    await authenticateUser(user.email, currentPassword);
 
-    const hashedPassword = await SecurePassword.hash(newPassword.trim())
-    await db.user.update({
-      where: { id: user.id },
-      data: { hashedPassword },
-    })
+    // 3. Create new password
+    const hashedPassword = await SecurePassword.hash(newPassword.trim());
 
-    return true
+    // 4. Update user
+    await db.request(
+      gql`
+        mutation UpdateUser($id: ID!, $data: UserInput!) {
+          updateUser(id: $id, data: $data) {
+            id: _id
+            email
+          }
+        }
+      `,
+      {
+        id: user.id,
+        data: {
+          hashedPassword,
+          email: user.email,
+          role: user.role,
+        },
+      }
+    );
+
+    return true;
   }
-)
+);

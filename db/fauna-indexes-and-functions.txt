@@ -1,0 +1,21 @@
+CreateIndex({
+  name: "all_sessions_by_user_id",
+  source: Collection("Session"),
+  terms: [
+    { field: ["data", "user", "id"]}
+  ]
+})
+
+
+CreateFunction({
+  name: "delete_sessions_by_user_id",
+  body: Query(
+          Lambda(
+            ["userId"],
+            Map(
+              Paginate(Match(Index("all_sessions_by_user_id"), Var("userId"))),
+              Lambda("sessionRef", Delete(Var("sessionRef")))
+            )
+          )
+        )
+})

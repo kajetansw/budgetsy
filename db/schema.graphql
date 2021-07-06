@@ -16,8 +16,22 @@ type Session {
   privateData: String
 }
 
+type Token {
+  hashedToken: String!
+  type: String!
+  expiresAt: Time!
+  sentTo: String!
+  user: User! @relation
+}
+
 type Query {
   allUsers: [User!]
   findUserByEmail(email: String!): User @index(name: "unique_User_email")
   findSessionByHandle(handle: String!): Session @index(name: "unique_Session_handle")
+  findTokenByType(type: String!): [Token!]
+  findTokenByTypeAndHashedToken(type: String!, hashedToken: String!): Token
+}
+
+type Mutation {
+  deleteSessionsByUserId(userId: ID!): Session @resolver(name: "delete_sessions_by_user_id")
 }
