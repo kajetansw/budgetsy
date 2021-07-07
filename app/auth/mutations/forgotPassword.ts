@@ -3,16 +3,17 @@ import db from 'db';
 import { forgotPasswordMailer } from 'mailers/forgotPasswordMailer';
 import { ForgotPassword } from '../validations';
 import { gql } from 'graphql-request';
+import { Token, User } from '../../../db/graphql-types';
 
 const RESET_PASSWORD_TOKEN_EXPIRATION_IN_HOURS = 4;
 
 export default resolver.pipe(resolver.zod(ForgotPassword), async ({ email }) => {
   // 1. Get the user
-  const { user } = await db.request(
+  const { user } = (await db.request(
     gql`
       query getUser($email: String!) {
         user: findUserByEmail(email: $email) {
-          id: _id
+          _id
           email
           name
           role
@@ -21,7 +22,7 @@ export default resolver.pipe(resolver.zod(ForgotPassword), async ({ email }) => 
       }
     `,
     { email: email.toLowerCase() }
-  );
+  )) as { user: User };
 
   // 2. Generate the token and expiration date.
   const token = generateToken();
@@ -32,34 +33,34 @@ export default resolver.pipe(resolver.zod(ForgotPassword), async ({ email }) => 
   // 3. If user with this email was found
   if (user) {
     // 4. Delete any existing password reset tokens
-    const { tokenData } = await db.request(
+    const { tokenData } = (await db.request(
       gql`
         query findTokenByType($type: String!) {
           tokenData: findTokenByType(type: $type) {
             data {
-              id: _id
+              _id
               user {
-                id: _id
+                _id
               }
             }
           }
         }
       `,
       { type: 'RESET_PASSWORD' }
-    );
+    )) as { tokenData: { data: Token[] } };
     const tokens = tokenData.data;
-    const tokensForMe = tokens.filter((t) => t.user.id === user.id);
+    const tokensForMe = tokens.filter((t) => t.user._id === user._id);
     await Promise.all([
       tokensForMe.map((t) =>
         db.request(
           gql`
             mutation deleteToken($id: ID!) {
               deleteToken(id: $id) {
-                id: _id
+                _id
               }
             }
           `,
-          { id: t.id }
+          { id: t._id }
         )
       ),
     ]);
@@ -83,7 +84,7 @@ export default resolver.pipe(resolver.zod(ForgotPassword), async ({ email }) => 
               user: $user
             }
           ) {
-            id: _id
+            _id
           }
         }
       `,
@@ -92,7 +93,7 @@ export default resolver.pipe(resolver.zod(ForgotPassword), async ({ email }) => 
         type: 'RESET_PASSWORD',
         expiresAt,
         sentTo: user.email,
-        user: { connect: user.id },
+        user: { connect: user._id },
       }
     );
     // 6. Send the email

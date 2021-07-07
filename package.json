@@ -2,14 +2,15 @@
   "name": "budgetsy",
   "version": "1.0.0",
   "scripts": {
-    "dev": "blitz dev",
     "build": "blitz build",
+    "dev": "blitz dev",
+    "generate": "graphql-codegen --config codegen.js",
+    "lint": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
+    "prepare": "husky install",
     "start": "blitz start",
     "studio": "blitz prisma studio",
-    "lint": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "prepare": "husky install"
+    "test:watch": "jest --watch"
   },
   "prisma": {
     "schema": "db/schema.prisma"
@@ -37,6 +38,11 @@
     "zod": "3.2.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "1.21.6",
+    "@graphql-codegen/introspection": "1.18.2",
+    "@graphql-codegen/typescript": "1.22.4",
+    "@graphql-codegen/typescript-operations": "1.18.3",
+    "@graphql-codegen/typescript-react-apollo": "2.3.0",
     "@types/preview-email": "2.0.0",
     "@types/react": "17.0.13",
     "eslint": "7.30.0",

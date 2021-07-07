@@ -1,13 +1,14 @@
 import { SecurePassword, AuthenticationError } from 'blitz';
 import db from 'db';
 import { gql } from 'graphql-request';
+import { User } from '../../db/graphql-types';
 
 export const authenticateUser = async (email: string, password: string) => {
-  const { user } = await db.request(
+  const { user } = (await db.request(
     gql`
       query getUser($email: String!) {
         user: findUserByEmail(email: $email) {
-          id: _id
+          _id
           email
           name
           role
@@ -16,7 +17,7 @@ export const authenticateUser = async (email: string, password: string) => {
       }
     `,
     { email: email.toLowerCase() }
-  );
+  )) as { user: User };
 
   if (!user || !user.hashedPassword) throw new AuthenticationError();
 
@@ -29,13 +30,13 @@ export const authenticateUser = async (email: string, password: string) => {
       gql`
         mutation UpdateUser($data: UserInput!) {
           updateUser(data: $data) {
-            id: _id
+            _id
           }
         }
       `,
       {
         data: {
-          id: user.id,
+          id: user._id,
           hashedPassword: improvedHash,
         },
       }

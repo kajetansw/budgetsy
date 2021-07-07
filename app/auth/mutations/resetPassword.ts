@@ -3,6 +3,7 @@ import db from 'db';
 import { ResetPassword } from '../validations';
 import login from './login';
 import { gql } from 'graphql-request';
+import { Token } from '../../../db/graphql-types';
 
 export class ResetPasswordError extends Error {
   name = 'ResetPasswordError';
@@ -12,14 +13,14 @@ export class ResetPasswordError extends Error {
 export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, token }, ctx) => {
   // 1. Try to find this token in the database
   const hashedToken = hash256(token);
-  const { possibleToken } = await db.request(
+  const { possibleToken } = (await db.request(
     gql`
       query findTokenByTypeAndHashedToken($type: String!, $hashedToken: String!) {
         possibleToken: findTokenByTypeAndHashedToken(type: $type, hashedToken: $hashedToken) {
-          id: _id
+          _id
           expiresAt
           user {
-            id: _id
+            _id
             email
             role
           }
@@ -27,7 +28,7 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
       }
     `,
     { hashedToken, type: 'RESET_PASSWORD' }
-  );
+  )) as { possibleToken: Token };
 
   // 2. If token not found, error
   if (!possibleToken) {
@@ -44,7 +45,7 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
         }
       }
     `,
-    { id: savedToken.id }
+    { id: savedToken._id }
   );
 
   // 4. If token has expired, error
@@ -64,7 +65,7 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
       }
     `,
     {
-      id: savedToken.user.id,
+      id: savedToken.user._id,
       data: {
         hashedPassword,
         email: savedToken.user.email,
@@ -83,7 +84,7 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
       }
     `,
     {
-      userId: savedToken.user.id,
+      userId: savedToken.user._id,
     }
   );
 

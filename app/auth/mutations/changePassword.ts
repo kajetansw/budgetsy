@@ -3,17 +3,18 @@ import db from 'db';
 import { ChangePassword } from '../validations';
 import { authenticateUser } from '../auth-utils';
 import { gql } from 'graphql-request';
+import { User } from '../../../db/graphql-types';
 
 export default resolver.pipe(
   resolver.zod(ChangePassword),
   resolver.authorize(),
   async ({ currentPassword, newPassword }, ctx) => {
     // 1. Find user
-    const { user } = await db.request(
+    const { user } = (await db.request(
       gql`
         query getUser($id: ID!) {
           user: findUserByID(id: $id) {
-            id: _id
+            _id
             email
             name
             role
@@ -21,7 +22,8 @@ export default resolver.pipe(
         }
       `,
       { id: ctx.session.userId }
-    );
+    )) as { user: User };
+
     if (!user) throw new NotFoundError();
 
     // 2. Authenticate
@@ -41,7 +43,7 @@ export default resolver.pipe(
         }
       `,
       {
-        id: user.id,
+        id: user._id,
         data: {
           hashedPassword,
           email: user.email,

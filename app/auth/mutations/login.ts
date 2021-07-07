@@ -9,7 +9,7 @@ export default async function login(input: LoginType, { session }: Ctx) {
   // This throws an error if credentials are invalid
   const user = await authenticateUser(email, password);
 
-  await session.$create({ userId: user.id, role: 'USER' });
+  await session.$create({ userId: user._id, role: 'USER' });
 
   return user;
 }
