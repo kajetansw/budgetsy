@@ -1,8 +1,10 @@
-[![Blitz.js](https://raw.githubusercontent.com/blitz-js/art/master/github-cover-photo.png)](https://blitzjs.com)
-
-This is a [Blitz.js](https://github.com/blitz-js/blitz) app.
+[![Blitz.js](./public/logo.png)](https://blitzjs.com)
 
 # **budgetsy**
+
+Your home budgets made easy.
+
+Written with [Blitz.js](https://github.com/blitz-js/blitz), [ChakraUI](https://chakra-ui.com/) and [Fauna](https://fauna.com/).
 
 ## Getting Started
 
