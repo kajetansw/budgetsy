@@ -1,4 +1,4 @@
-import { sessionMiddleware, simpleRolesIsAuthorized } from 'blitz';
+import { sessionMiddleware, SessionModel, simpleRolesIsAuthorized } from 'blitz';
 import { gql, GraphQLClient } from 'graphql-request';
 
 const graphQLClient = new GraphQLClient('https://graphql.eu.fauna.com/graphql', {
@@ -75,7 +75,7 @@ module.exports = {
           {
             data: {
               ...sessionInput,
-              expiresAt: sessionInput.expiresAt.toISOString(),
+              expiresAt: sessionInput.expiresAt!.toISOString(),
               user: userInput,
             },
           }
@@ -117,7 +117,7 @@ module.exports = {
             data: {
               ...sessionInput,
               id: existingSession.id,
-              expiresAt: sessionInput.expiresAt.toISOString(),
+              expiresAt: sessionInput.expiresAt!.toISOString(),
             },
           }
         );
@@ -135,7 +135,7 @@ module.exports = {
           { handle: handle }
         );
 
-        await graphQLClient.request(
+        return (await graphQLClient.request(
           gql`
             mutation DeleteSession($id ID!) {
               deleteSession(id: $id) {
@@ -147,7 +147,7 @@ module.exports = {
           {
             id: existingSession.id,
           }
-        );
+        )) as SessionModel;
       },
     }),
   ],
