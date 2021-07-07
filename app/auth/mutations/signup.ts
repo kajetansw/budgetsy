@@ -13,7 +13,7 @@ export default async function signup(input: SignupType, { session }: Ctx) {
     gql`
       mutation createUser($email: String!, $hashedPassword: String, $role: String!) {
         user: createUser(data: { email: $email, hashedPassword: $hashedPassword, role: $role }) {
-          id: _id
+          _id
           email
           name
           role
