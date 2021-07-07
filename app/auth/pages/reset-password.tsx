@@ -1,17 +1,18 @@
-import { BlitzPage, useRouterQuery, Link, useMutation, Routes } from 'blitz';
+import { BlitzPage, Link, Routes, useMutation, useRouterQuery } from 'blitz';
 import Layout from 'app/core/layouts/Layout';
 import { LabeledTextField } from 'app/core/components/LabeledTextField';
 import { Form, FORM_ERROR } from 'app/core/components/Form';
 import { ResetPassword } from 'app/auth/validations';
 import resetPassword from 'app/auth/mutations/resetPassword';
+import { Button, Flex, Heading } from '@chakra-ui/react';
 
 const ResetPasswordPage: BlitzPage = () => {
   const query = useRouterQuery();
   const [resetPasswordMutation, { isSuccess }] = useMutation(resetPassword);
 
   return (
-    <div>
-      <h1>Set a New Password</h1>
+    <Flex direction={'column'} justifyContent={'center'} alignItems={'center'} mt={10}>
+      <Heading mb={10}>Set a New Password</Heading>
 
       {isSuccess ? (
         <div>
@@ -22,7 +23,7 @@ const ResetPasswordPage: BlitzPage = () => {
         </div>
       ) : (
         <Form
-          submitText="Reset Password"
+          id="reset-password-form"
           schema={ResetPassword}
           initialValues={{ password: '', passwordConfirmation: '', token: query.token as string }}
           onSubmit={async (values) => {
@@ -47,9 +48,14 @@ const ResetPasswordPage: BlitzPage = () => {
             label="Confirm New Password"
             type="password"
           />
+          <Flex direction={'column'} alignItems={'center'} mt={8}>
+            <Button type={'submit'} form="reset-password-form">
+              Reset Password
+            </Button>
+          </Flex>
         </Form>
       )}
-    </div>
+    </Flex>
   );
 };
 

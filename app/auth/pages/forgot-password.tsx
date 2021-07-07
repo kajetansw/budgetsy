@@ -1,16 +1,17 @@
-import { BlitzPage, useMutation } from "blitz"
-import Layout from "app/core/layouts/Layout"
-import { LabeledTextField } from "app/core/components/LabeledTextField"
-import { Form, FORM_ERROR } from "app/core/components/Form"
-import { ForgotPassword } from "app/auth/validations"
-import forgotPassword from "app/auth/mutations/forgotPassword"
+import { BlitzPage, useMutation } from 'blitz';
+import Layout from 'app/core/layouts/Layout';
+import { LabeledTextField } from 'app/core/components/LabeledTextField';
+import { Form, FORM_ERROR } from 'app/core/components/Form';
+import { ForgotPassword } from 'app/auth/validations';
+import forgotPassword from 'app/auth/mutations/forgotPassword';
+import { Button, Flex, Heading } from '@chakra-ui/react';
 
 const ForgotPasswordPage: BlitzPage = () => {
-  const [forgotPasswordMutation, { isSuccess }] = useMutation(forgotPassword)
+  const [forgotPasswordMutation, { isSuccess }] = useMutation(forgotPassword);
 
   return (
-    <div>
-      <h1>Forgot your password?</h1>
+    <Flex direction={'column'} justifyContent={'center'} alignItems={'center'} mt={10}>
+      <Heading mb={10}>Forgot your password?</Heading>
 
       {isSuccess ? (
         <div>
@@ -22,27 +23,32 @@ const ForgotPasswordPage: BlitzPage = () => {
         </div>
       ) : (
         <Form
-          submitText="Send Reset Password Instructions"
+          id="forgot-password-form"
           schema={ForgotPassword}
-          initialValues={{ email: "" }}
+          initialValues={{ email: '' }}
           onSubmit={async (values) => {
             try {
-              await forgotPasswordMutation(values)
+              await forgotPasswordMutation(values);
             } catch (error) {
               return {
-                [FORM_ERROR]: "Sorry, we had an unexpected error. Please try again.",
-              }
+                [FORM_ERROR]: 'Sorry, we had an unexpected error. Please try again.',
+              };
             }
           }}
         >
           <LabeledTextField name="email" label="Email" placeholder="Email" />
+          <Flex direction={'column'} alignItems={'center'}>
+            <Button type={'submit'} form="forgot-password-form">
+              Send Reset Password Instructions
+            </Button>
+          </Flex>
         </Form>
       )}
-    </div>
-  )
-}
+    </Flex>
+  );
+};
 
-ForgotPasswordPage.redirectAuthenticatedTo = "/"
-ForgotPasswordPage.getLayout = (page) => <Layout title="Forgot Your Password?">{page}</Layout>
+ForgotPasswordPage.redirectAuthenticatedTo = '/';
+ForgotPasswordPage.getLayout = (page) => <Layout title="Forgot Your Password?">{page}</Layout>;
 
-export default ForgotPasswordPage
+export default ForgotPasswordPage;

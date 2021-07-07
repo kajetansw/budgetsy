@@ -27,9 +27,13 @@
     ]
   },
   "dependencies": {
+    "@chakra-ui/react": "1.6.4",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
     "@prisma/client": "2.26.0",
     "blitz": "0.38.2",
     "final-form": "4.20.2",
+    "framer-motion": "^4",
     "graphql": "15.5.1",
     "graphql-request": "3.4.0",
     "react": "alpha",
