@@ -1,9 +1,9 @@
-import { resolver, generateToken, hash256 } from 'blitz';
+import { generateToken, hash256, resolver } from 'blitz';
 import db from 'db';
 import { forgotPasswordMailer } from 'mailers/forgotPasswordMailer';
 import { ForgotPassword } from '../validations';
 import { gql } from 'graphql-request';
-import { Token, User } from '../../../db/graphql-types';
+import { User } from '../../../db/graphql-types';
 
 const RESET_PASSWORD_TOKEN_EXPIRATION_IN_HOURS = 4;
 
@@ -22,7 +22,7 @@ export default resolver.pipe(resolver.zod(ForgotPassword), async ({ email }) => 
       }
     `,
     { email: email.toLowerCase() }
-  )) as { user: User };
+  )) as { user: Pick<User, '_id' | 'email' | 'name' | 'role' | 'hashedPassword'> };
 
   // 2. Generate the token and expiration date.
   const token = generateToken();

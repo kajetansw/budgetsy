@@ -17,7 +17,7 @@ export const authenticateUser = async (email: string, password: string) => {
       }
     `,
     { email: email.toLowerCase() }
-  )) as { user: User };
+  )) as { user: Pick<User, '_id' | 'email' | 'name' | 'role' | 'hashedPassword'> };
 
   if (!user || !user.hashedPassword) throw new AuthenticationError();
 

@@ -28,7 +28,11 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
       }
     `,
     { hashedToken, type: 'RESET_PASSWORD' }
-  )) as { possibleToken: Token };
+  )) as {
+    possibleToken: Pick<Token, '_id' | 'expiresAt'> & {
+      user: Pick<Token['user'], '_id' | 'email' | 'role'>;
+    };
+  };
 
   // 2. If token not found, error
   if (!possibleToken) {
@@ -55,7 +59,7 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
 
   // 5. Since token is valid, now we can update the user's password
   const hashedPassword = await SecurePassword.hash(password.trim());
-  const { user } = await db.request(
+  await db.request(
     gql`
       mutation UpdateUser($id: ID!, $data: UserInput!) {
         updateUser(id: $id, data: $data) {

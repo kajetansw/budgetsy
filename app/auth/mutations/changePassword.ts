@@ -22,7 +22,7 @@ export default resolver.pipe(
         }
       `,
       { id: ctx.session.userId }
-    )) as { user: User };
+    )) as { user: Pick<User, '_id' | 'email' | 'name' | 'role'> };
 
     if (!user) throw new NotFoundError();
 
