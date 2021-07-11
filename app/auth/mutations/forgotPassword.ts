@@ -33,37 +33,16 @@ export default resolver.pipe(resolver.zod(ForgotPassword), async ({ email }) => 
   // 3. If user with this email was found
   if (user) {
     // 4. Delete any existing password reset tokens
-    const { tokenData } = (await db.request(
+    await db.request(
       gql`
-        query findTokenByType($type: String!) {
-          tokenData: findTokenByType(type: $type) {
-            data {
-              _id
-              user {
-                _id
-              }
-            }
+        mutation deleteTokensByUserId($userId: ID!) {
+          deleteTokensByUserId(userId: $userId) {
+            expiresAt
           }
         }
       `,
-      { type: 'RESET_PASSWORD' }
-    )) as { tokenData: { data: Token[] } };
-    const tokens = tokenData.data;
-    const tokensForMe = tokens.filter((t) => t.user._id === user._id);
-    await Promise.all([
-      tokensForMe.map((t) =>
-        db.request(
-          gql`
-            mutation deleteToken($id: ID!) {
-              deleteToken(id: $id) {
-                _id
-              }
-            }
-          `,
-          { id: t._id }
-        )
-      ),
-    ]);
+      { userId: user._id }
+    );
 
     // 5. Save this new token in the database.
     await db.request(

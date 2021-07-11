@@ -36,6 +36,7 @@ export type Mutation = {
   deleteUser?: Maybe<User>;
   /** Update an existing document in the collection of 'Token' */
   updateToken?: Maybe<Token>;
+  deleteTokensByUserId?: Maybe<Token>;
 };
 
 export type MutationUpdateUserArgs = {
@@ -79,6 +80,10 @@ export type MutationDeleteUserArgs = {
 export type MutationUpdateTokenArgs = {
   id: Scalars['ID'];
   data: TokenInput;
+};
+
+export type MutationDeleteTokensByUserIdArgs = {
+  userId: Scalars['ID'];
 };
 
 export type Query = {

@@ -6,6 +6,14 @@ CreateIndex({
   ]
 })
 
+CreateIndex({
+  name: "all_tokens_by_user_id",
+  source: Collection("Token"),
+  terms: [
+    { field: ["data", "user", "id"]}
+  ]
+})
+
 
 CreateFunction({
   name: "delete_sessions_by_user_id",
@@ -15,6 +23,19 @@ CreateFunction({
             Map(
               Paginate(Match(Index("all_sessions_by_user_id"), Var("userId"))),
               Lambda("sessionRef", Delete(Var("sessionRef")))
+            )
+          )
+        )
+})
+
+CreateFunction({
+  name: "delete_tokens_by_user_id",
+  body: Query(
+          Lambda(
+            ["userId"],
+            Map(
+              Paginate(Match(Index("all_tokens_by_user_id"), Var("userId"))),
+              Lambda("tokenRef", Delete(Var("tokenRef")))
             )
           )
         )
