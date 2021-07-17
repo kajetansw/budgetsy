@@ -33,6 +33,6 @@ type Query {
 }
 
 type Mutation {
-  deleteSessionsByUserId(userId: ID!): Session @resolver(name: "delete_sessions_by_user_id")
-  deleteTokensByUserId(userId: ID!): Token @resolver(name: "delete_tokens_by_user_id")
+  deleteSessionsByUserId(userId: ID!): [Session] @resolver(name: "delete_sessions_by_user_id")
+  deleteTokensByUserId(userId: ID!): [Token] @resolver(name: "delete_tokens_by_user_id")
 }

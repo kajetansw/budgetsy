@@ -23,7 +23,7 @@ export type Mutation = {
   deleteSession?: Maybe<Session>;
   /** Create a new document in the collection of 'User' */
   createUser: User;
-  deleteSessionsByUserId?: Maybe<Session>;
+  deleteSessionsByUserId?: Maybe<Array<Maybe<Session>>>;
   /** Delete an existing document in the collection of 'Token' */
   deleteToken?: Maybe<Token>;
   /** Create a new document in the collection of 'Token' */
@@ -36,7 +36,7 @@ export type Mutation = {
   deleteUser?: Maybe<User>;
   /** Update an existing document in the collection of 'Token' */
   updateToken?: Maybe<Token>;
-  deleteTokensByUserId?: Maybe<Token>;
+  deleteTokensByUserId?: Maybe<Array<Maybe<Token>>>;
 };
 
 export type MutationUpdateUserArgs = {

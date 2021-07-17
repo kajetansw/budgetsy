@@ -18,25 +18,35 @@ CreateIndex({
 CreateFunction({
   name: "delete_sessions_by_user_id",
   body: Query(
-          Lambda(
-            ["userId"],
-            Map(
-              Paginate(Match(Index("all_sessions_by_user_id"), Var("userId"))),
-              Lambda("sessionRef", Delete(Var("sessionRef")))
-            )
+    Lambda(
+      ["userId"],
+      Let(
+        {
+          sessionDoc: Map(
+            Paginate(Match(Index("all_sessions_by_user_id"), Var("userId"))),
+            Lambda("sessionRef", Delete(Var("sessionRef")))
           )
-        )
+        },
+        Select(["data"], Var("sessionDoc"))
+      )
+    )
+  )
 })
 
 CreateFunction({
   name: "delete_tokens_by_user_id",
   body: Query(
-          Lambda(
-            ["userId"],
-            Map(
-              Paginate(Match(Index("all_tokens_by_user_id"), Var("userId"))),
-              Lambda("tokenRef", Delete(Var("tokenRef")))
-            )
+    Lambda(
+      ["userId"],
+      Let(
+        {
+          tokenDoc: Map(
+            Paginate(Match(Index("all_tokens_by_user_id"), Var("userId"))),
+            Lambda("tokenRef", Delete(Var("tokenRef")))
           )
-        )
+        },
+        Select(["data"], Var("tokenDoc"))
+      )
+    )
+  )
 })
